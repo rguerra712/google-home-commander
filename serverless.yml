@@ -1,0 +1,33 @@
+service:
+  name: google-home-commander
+
+plugins:
+  - serverless-dynamic-dotenv
+  - serverless-offline
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:SendMessage"
+        - "sqs:GetQueueUrl"
+      Resource: ${env:HOME_NETWORK_QUEUE_ARN}
+
+functions:
+  talk:
+    handler: src/handler.talk
+    events:
+      - http:
+          method: post
+          path: talk
+          cors: true
+  talkWebsite:
+    handler: src/handler.talkWebsite
+    events:
+      - http:
+          method: get
+          path: talk

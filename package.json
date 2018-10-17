@@ -1,0 +1,30 @@
+{
+  "name": "google-home-commander",
+  "version": "1.0.0",
+  "description": "Serverless webpack example using Typescript",
+  "main": "handler.js",
+  "scripts": {
+    "test": "tsc && jest"
+  },
+  "dependencies": {
+    "sqs-producer": "^1.6.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.1",
+    "@types/jest": "^23.3.5",
+    "@types/node": "^8.0.57",
+    "@types/sqs-producer": "^1.5.4",
+    "@types/uuid": "^3.4.4",
+    "gts": "^0.8.0",
+    "jest": "^23.6.0",
+    "serverless-dynamic-dotenv": "^1.0.2",
+    "serverless-webpack": "^5.1.1",
+    "source-map-support": "^0.5.6",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.5.0"
+  },
+  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "license": "MIT"
+}
