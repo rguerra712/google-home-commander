@@ -2,11 +2,12 @@
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2017",
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "outDir": ".build"
   },
   "exclude": [
     "node_modules"

@@ -6,28 +6,78 @@ plugins:
   - serverless-offline
   - serverless-webpack
 
+custom:
+  region: ${opt:region, self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  tableName: ${self:custom.stage}-devices
+  tableThroughputs:
+    prod: 5
+    default: 1
+  tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    
 provider:
   name: aws
+  region: ${opt:region, 'us-east-1'}
   runtime: nodejs8.10
   stage: ${opt:stage, 'dev'}
+  environment:
+    DYNAMODB_TABLE: ${self:custom.tableName}
+    REGION: ${self:custom.region}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "sqs:SendMessage"
         - "sqs:GetQueueUrl"
       Resource: ${env:HOME_NETWORK_QUEUE_ARN}
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      # Restrict our IAM role permissions to
+      # the specific table for the stage
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
 functions:
   talk:
-    handler: src/handler.talk
+    handler: src/handlers/talk-api.talk
     events:
       - http:
           method: post
           path: talk
           cors: true
   talkWebsite:
-    handler: src/handler.talkWebsite
+    handler: src/handlers/talk-web.talkWebsite
     events:
       - http:
           method: get
           path: talk
+  devicePostApi:
+    handler: src/handlers/device-api.postDevice
+    events:
+      - http:
+          method: post
+          path: users/{userId}/devices
+  deviceGetApi:
+    handler: src/handlers/device-api.getDevice
+    events:
+      - http:
+          method: get
+          path: users/{userId}/devices
+  deviceGetByIdApi:
+    handler: src/handlers/device-api.getDeviceById
+    events:
+      - http:
+          method: get
+          path: users/{userId}/devices/{deviceId}
+
+resources:
+  - ${file(resources/devices  -table.yml)}

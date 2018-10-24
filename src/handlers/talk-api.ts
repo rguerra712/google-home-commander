@@ -1,6 +1,5 @@
-import { GoogleCommander } from './google-commander';
+import { GoogleCommander } from '../google-commander';
 import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
-import { buildHtml } from './html-builder';
 
 export const talk: Handler = (event: APIGatewayEvent, context: Context, cb: Callback) => {
   const googleCommander = new GoogleCommander();
@@ -23,18 +22,6 @@ export const talk: Handler = (event: APIGatewayEvent, context: Context, cb: Call
     body: JSON.stringify({
       message: 'Message sent!',
     }),
-  };
-
-  cb(null, response);
-};
-
-export const talkWebsite: Handler = (event: APIGatewayEvent, context: Context, cb: Callback) => {
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'text/html',
-    },
-    body: buildHtml(),
   };
 
   cb(null, response);
