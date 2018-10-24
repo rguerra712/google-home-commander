@@ -1,4 +1,13 @@
-export function buildHtml() {
+import { DeviceRepository } from './devices/device-repository';
+export class HtmlBuilder {
+  private deviceRepository: DeviceRepository;
+
+  constructor(deviceRepository: DeviceRepository) {
+      this.deviceRepository = deviceRepository;
+  }
+
+  async buildHtml(homeUserId: string) {
+    const deviceOptions = this.getDeviceOptions(homeUserId);
     return `
 <!DOCTYPE html>
 <html>
@@ -32,6 +41,10 @@ export function buildHtml() {
   </head>
   <body>
     <form onsubmit="talk()" class="flex-container">
+      <label>Choose your device:</label>
+      <select id="device">
+        ${deviceOptions}
+      </select>
       <div>
         <input type="text" id="text-to-send" class="input-text" autofocus autocomplete="off"></input>
       </div>
@@ -44,11 +57,24 @@ export function buildHtml() {
     const talk = async () => {
     const textInput = document.getElementById('text-to-send');
     const text = textInput.value;
-    const response = await fetch("${process.env['AWS_API_POST_URL']}?text=" + text, { method: 'POST' })
+    const url = "${process.env['AWS_API_POST_URL']}?text=" + text;
+    const device = document.getElementById('device');
+    const deviceValue = device.value;
+    if (deviceValue) {
+      url += '?deviceId=' + deviceValue;
+    }
+    const response = await fetch(, { method: 'POST' })
     console.log(response.status);
     textInput.clear();
     return false;
     }
   </script>
 </html>`;
+  }
+
+  private async getDeviceOptions(homeUserId: string): Promise<string> {
+    const devices = await this.deviceRepository.get(homeUserId);
+    const options = devices.map(device => `<option value="${device.deviceId}">${device.deviceName}</option>`);
+    return options.join('\n');
+  }
 }

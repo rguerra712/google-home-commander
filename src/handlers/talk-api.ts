@@ -16,7 +16,11 @@ export const talk: Handler = (event: APIGatewayEvent, context: Context, cb: Call
     cb(null, response);
     return;  
   }
-  googleCommander.talk(text);
+  let deviceId = query && query['deviceId'];
+  if (!deviceId) {
+    deviceId = process.env['DEFAULT_HOME_DEVICE_ID'] || '';
+  }
+  googleCommander.talk(text, deviceId);
   const response = {
     statusCode: 200,
     body: JSON.stringify({
