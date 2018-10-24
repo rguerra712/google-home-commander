@@ -4,6 +4,8 @@ import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 export const talk: Handler = (event: APIGatewayEvent, context: Context, cb: Callback) => {
   const googleCommander = new GoogleCommander();
   const query = event.queryStringParameters || {};
+  console.log(event.path);
+  console.log(event.queryStringParameters);
   const text = query['text'];
   if (!text) {
     const response = {
@@ -16,7 +18,7 @@ export const talk: Handler = (event: APIGatewayEvent, context: Context, cb: Call
     cb(null, response);
     return;  
   }
-  let deviceId = query && query['deviceId'];
+  let deviceId = query['deviceId'];
   if (!deviceId) {
     deviceId = process.env['DEFAULT_HOME_DEVICE_ID'] || '';
   }

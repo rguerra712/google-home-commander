@@ -7,7 +7,7 @@ export class HtmlBuilder {
   }
 
   async buildHtml(homeUserId: string) {
-    const deviceOptions = this.getDeviceOptions(homeUserId);
+    const deviceOptions = await this.getDeviceOptions(homeUserId);
     return `
 <!DOCTYPE html>
 <html>
@@ -57,13 +57,13 @@ export class HtmlBuilder {
     const talk = async () => {
     const textInput = document.getElementById('text-to-send');
     const text = textInput.value;
-    const url = "${process.env['AWS_API_POST_URL']}?text=" + text;
+    let url = "${process.env['AWS_API_POST_URL']}?text=" + text;
     const device = document.getElementById('device');
     const deviceValue = device.value;
     if (deviceValue) {
-      url += '?deviceId=' + deviceValue;
+      url = url + '&deviceId=' + deviceValue;
     }
-    const response = await fetch(, { method: 'POST' })
+    const response = await fetch(url, { method: 'POST' })
     console.log(response.status);
     textInput.clear();
     return false;
