@@ -34,15 +34,21 @@ export class HtmlBuilder {
         text-align: center;
         font-size: 30px;
         background-color: LightBlue;
+        margin-top: 10px
+      }
+      .input-device {
+        text-align: center;
+        font-size: 50px;
+        margin-bottom: 10px;
       }
     </style>
     <meta charset="UTF-8">
     <title>Chat with google</title>
   </head>
-  <body>
+  <body onload="loadLastDevice()">
     <form onsubmit="talk()" class="flex-container">
       <label>Choose your device:</label>
-      <select id="device">
+      <select id="device" class="input-device" onchange="setLastDevice(this)">
         ${deviceOptions}
       </select>
       <div>
@@ -55,19 +61,50 @@ export class HtmlBuilder {
   </body>
   <script>
     const talk = async () => {
-    const textInput = document.getElementById('text-to-send');
-    const text = textInput.value;
-    let url = "${process.env['AWS_API_POST_URL']}?text=" + text;
-    const device = document.getElementById('device');
-    const deviceValue = device.value;
-    if (deviceValue) {
-      url = url + '&deviceId=' + deviceValue;
-    }
-    const response = await fetch(url, { method: 'POST' })
-    console.log(response.status);
-    textInput.clear();
-    return false;
-    }
+      const textInput = document.getElementById('text-to-send');
+      const text = textInput.value;
+      let url = "${process.env['AWS_API_POST_URL']}?text=" + text;
+      const device = document.getElementById('device');
+      const deviceValue = device.value;
+      if (deviceValue) {
+        url = url + '&deviceId=' + deviceValue;
+      }
+      const response = await fetch(url, { method: 'POST' })
+      console.log(response.status);
+      textInput.clear();
+      return false;
+    };
+
+    const loadLastDevice = () => {
+      const lastDevice = getCookie('lastDevice');
+      const device = document.getElementById('device');
+      device.value = lastDevice;
+    };
+
+    const setLastDevice = input => {
+      const value = input.value;
+      setCookie('lastDevice', value, 100);
+    };
+
+    const setCookie = (cname, cvalue) => {
+      document.cookie = cname + "=" + cvalue;
+    };
+
+    const getCookie = cname => {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+          }
+      }
+      return "";
+    };
   </script>
 </html>`;
   }
